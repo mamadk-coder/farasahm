@@ -31,7 +31,7 @@ function App() {
 
       <img src='fidiptype.png'/>
       <p class=" text-gray-200 focus:border bg-blue-600 rounded w-30 h-15 "  > سامانه مدیریت امور سهام</p>
-      <a href='#' class="text-blue-600  ">www.fidip.ir</a>
+      {/* <a href='#' class="text-blue-600  ">www.fidip.ir</a> */}
       </div>
     </div>
   );
