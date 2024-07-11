@@ -2,128 +2,137 @@ import logo from './logo.svg';
 import './App.css';
 import Login from './component/login';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { onrun } from './component/confing';
+
+
 
 
 
 function App() {
   const [phone, setPhone] = useState('');
-  const sub= () => {
-    console.log(phone);
-  };
+  const [code, setCode] = useState('');
+  const [otp, setOtp] = useState('');
+  const [imgCaptcha, setImgCaptch] = useState(null)
+  const [CaptchaCode, setCaptchaCode] = useState(null)
+  const [errMsg, setErrMsg] = useState('')
+  const [step, setStep] = useState(1);
+
+
+  const getCaptua = () => {
+    axios.post(onrun + '/captcha')
+      .then((response) => {
+        setImgCaptch(response.data.image);
+        setCaptchaCode(response.data.encrypted_response);
+      })
+
+
+
+  }
+  const submit = () => {
+    if (phone.length != 11) {
+      setErrMsg('شماره همراه میبایست 11 رقم باشد')
+      alert('phone')
+    } else if (code.length != 4) {
+      setErrMsg('کد تصویر صحیح نیست')
+      alert('code')
+    }
+
+    else {
+      let inputPhone = { 'phone': phone, 'captcha': code, 'code': '' }
+      axios.post(onrun + '/applyphone', { inputPhone: inputPhone, captchaCode: CaptchaCode })
+        .then((response) => {
+          console.log(response.data);
+          if(response.data.replay){
+            setStep(2)
+            setErrMsg('')
+        }else{
+            setErrMsg(response.data.msg)
+        }
+
+
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    }
+
+  }
+
+  const login = ()=>{
+    console.log('logiiiiiin');
+  }
 
 
 
 
+  useEffect(getCaptua, [])
+  return (
 
-    return (
 
 
+    <div className="App flex items-end   mt-40 ml-36">
+      <div className='asl'>
+        <h1>
 
-  <div className="App flex items-end   mt-40 ml-36">
-    <div className='asl'>
-      <h1>
+        </h1>
+        <div className="flex justify-center ...">
+          <div className="w-full bg-blue-200 rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 border-4 border-indigo-500/100 border-solid border-2 border-indigo-800">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8 mr-10" >
+              {
+                step==2 ?
+                  <>
+                    <input value={otp} onChange={(e) => setOtp(e.target.value )} placeholder='کد تایید' type='phone' />
+                    <div className='column flex flex-col '>
 
-      </h1>
-      <div className="flex justify-center ...">
-        <div className="w-full bg-blue-200 rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 border-4 border-indigo-500/100 border-solid border-2 border-indigo-800">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8 mr-10" >
+                    <button className='ent text-gray-200 focus:border bg-blue-600 rounded w-16 h-9 ml-16' onClick={login}>تایید</button>
+                    <button className='btnEdt mt-3 text-blue-700' onClick={() => setStep(1)}>ویرایش</button>
+                    </div>
+                  </> :
+                  <>
 
-            <input class="flex flex-col ml-14 items-center rounded-lg" placeholder="شماره همراه" type="tel"
-              value={phone}
-              onChange={e=>setPhone(e.target.value)}
-              required
-              pattern="[0-9]{10}"
-             ></input>
-            <input class="flex flex-col items-center ml-14 rounded-lg " placeholder="کد تصویر"  ></input>
-            <div className="w-44 ml-16 rounded-lg">
 
-              <img src='captua.png' />
+                    <input className="flex flex-col ml-14 items-center rounded-lg" placeholder="شماره همراه" type="tel"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                      required
+                      pattern="[0-9]{10}"
+                    ></input>
+                    <input className="flex flex-col items-center ml-14 rounded-lg " placeholder="کد تصویر"
+                      value={code}
+                      onChange={e => setCode(e.target.value)}
+                      required
+                      pattern="[0-9]{10}"  ></input>
+                    <div className="w-44 ml-16 rounded-lg">
+
+                      {
+                        imgCaptcha == null ? null :
+                          <img onClick={getCaptua} src={`data:image/png;base64,${imgCaptcha}`} />
+                      }
+                    </div>
+
+
+                    <button className="text-gray-200 focus:border bg-blue-600 rounded w-16 h-9" onClick={submit} >
+                      تایید
+                    </button>
+                  </>
+              }
+
+
             </div>
-    
-
-            <button class="text-gray-200 focus:border bg-blue-600 rounded w-16 h-9"  onClick={sub}> 
-              تایید
-              </button>
-            
-
           </div>
         </div>
       </div>
-    </div>
-    <div class="columns-1 ml-80">
+      <div className="columns-1 ml-80">
 
-      <img src='fidiptype.png' />
-      <p class=" text-gray-200 focus:border bg-blue-600 rounded w-30 h-15 "  > سامانه مدیریت امور سهام</p>
-      <a href='#' class="text-blue-600  ">www.fidip.ir</a>
+        <img src='fidiptype.png' />
+        <p className=" text-gray-200 focus:border bg-blue-600 rounded w-30 h-15 "  > سامانه مدیریت امور سهام</p>
+        <a href='#' className="text-blue-600  ">www.fidip.ir</a>
+      </div>
     </div>
-  </div>
 
-    )
+  )
 }
-
-
-// const FormPhoneInput = () => {
-//   const [phone, setPhone] = useState('');
-
-//   const handlePhoneChange = (e) => {
-//     setPhone(e.target.value);
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-
-//   };
-
-//   return (
-//     <>
-//       <form onSubmit={handleSubmit}>
-//         <label>
-//           Phone Number:
-//           <input
-//             type="tel"
-//             value={phone}
-//             onChange={handlePhoneChange}
-//             required
-//             pattern="[0-9]{10}"
-//             placeholder="Enter your phone number"
-//           />
-//         </label>
-//         <button type="submit">Submit</button>
-//       </form>
-//       <p className='text-red-400'>Phone number entered:<span className='text-black'>{phone}</span> </p> {/* نمایش شماره همراه وارد شده */}
-//     </>
-//   );
-// };
-// const FormNameInput = () => {
-//   const [name, setName] = useState('');
-//   const handleNamechange = (e) => {
-//     setName(e.target.value);
-//   };
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//   };
-//   return (
-//     <>
-//       <form onSubmit={handleSubmit}>
-//         <label>
-//           lastname
-//           <input type=""
-//             value={name}
-//             onChange={handleNamechange}
-//             required
-//             placeholder="Enter your last name"
-//           />
-//         </label>
-//         <button type="submit">Submit</button>
-//       </form>
-//       <p className='text-red-400'>Enter your last name:<span className='text-black'>{name}</span> </p> {/* نمایش شماره همراه وارد شده */}
-//     </>
-//   );
-// };
-
-
-
 export default App;
 
 
