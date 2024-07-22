@@ -11,6 +11,22 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+li>ul {
+  display: none; /* زیرمنو پیش‌فرض پنهان باشد */
+}
+
+li:hover>ul {
+  display: flex; /* نمایش زیرمنو هنگامی که روی گزیده هوور شده است */
+  flex-direction: column-reverse
+}
+li>.fub {
+  display: none;
+}
+li:hover>.sub{
+  display: flex
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
